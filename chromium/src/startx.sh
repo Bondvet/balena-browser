@@ -12,7 +12,7 @@ function reverse_window_coordinates () {
     echo "${coords[1]},${coords[0]}"
   else
     echo "Screen coordinates not set correctly, so cannot reverse them."
-  fi 
+  fi
 }
 
 function rotate_touch () {
@@ -42,14 +42,14 @@ if [[ ! -z "$ROTATE_DISPLAY" ]]; then
 
   #If the display is rotated to left or right, we need to reverse the size and position coords
   if [[ "$ROTATE_DISPLAY" == "left" ]] || [[ "$ROTATE_DISPLAY" == "right" ]]; then
-    
+
     echo "Display rotated to portait. Reversing screen coordinates"
-    
+
     #window size
     REVERSED_SIZE="$(reverse_window_coordinates $WINDOW_SIZE)"
     WINDOW_SIZE=$REVERSED_SIZE
     echo "Reversed window size: $WINDOW_SIZE"
-    
+
     #window position, if set
     if [[ "$WINDOW_POSITION" -ne "0,0" ]]
     then
@@ -70,9 +70,9 @@ if [[ ! -z "$ROTATE_DISPLAY" ]]; then
   fi
 fi
 
-# these two lines remove the "restore pages" popup on chromium. 
-sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' /data/chromium/'Local State' > /dev/null 2>&1 || true 
-sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' /data/chromium/Default/Preferences > /dev/null 2>&1 || true 
+# these two lines remove the "restore pages" popup on chromium.
+sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' /data/chromium/'Local State' > /dev/null 2>&1 || true
+sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' /data/chromium/Default/Preferences > /dev/null 2>&1 || true
 
 # Set chromium version into an EnVar for later
 export VERSION=`chromium-browser --version`
@@ -81,4 +81,26 @@ echo "Installed browser version: $VERSION"
 # stop the screen blanking
 xset s off -dpms
 
+# read the refresh token file
+if [[ $REFRESH_TOKEN_FILE ]]; then
+  if [[ -f "$REFRESH_TOKEN_FILE" ]]; then
+    export REFRESH_TOKEN=`cat $REFRESH_TOKEN_FILE`
+  fi
+fi
+
+if [[ $REFRESH_TOKEN ]]; then
+    export DISPLAY_URL="$DISPLAY_URL?token=$REFRESH_TOKEN"
+fi
+
+export LAUNCH_URL="file:///home/chromium/index.html?url=${DISPLAY_URL}"
+# export LAUNCH_URL=$DISPLAY_URL
+
 node /usr/src/app/server.js
+
+#/usr/bin/chromium-browser \
+#  --window-size=1920,1080 \
+#  --autoplay-policy=no-user-gesture-required \
+#  --noerrdialogs \
+#  --disable-session-crashed-bubble \
+#  --check-for-update-interval=31536000 \
+#  --disable-dev-shm-usage

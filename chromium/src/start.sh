@@ -16,7 +16,7 @@ echo "balenaLabs browser version: $(<VERSION)"
 
 # this stops the CPU performance scaling down
 echo "Setting CPU Scaling Governor to 'performance'"
-echo 'performance' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+echo 'performance' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 # check if display number envar was set
 if [[ -z "$DISPLAY_NUM" ]]
@@ -65,6 +65,13 @@ rm -f /data/chromium/SingletonLock
 environment=$(env | grep -v -w '_' | awk -F= '{ st = index($0,"=");print substr($1,0,st) ","}' | tr -d "\n")
 # remove the last comma
 environment="${environment::-1}"
+
+
+# mount the token folder, if we're on balena
+if [ "$BALENA" == "1" ]; then
+  mkdir -p /mnt/data
+  mount /dev/mmcblk0p6 /mnt/data
+fi
 
 # launch Chromium and whitelist the enVars so that they pass through to the su session
 su -w $environment -c "export DISPLAY=:$DISPLAY_NUM && startx /usr/src/app/startx.sh $CURSOR" - chromium

@@ -6,8 +6,12 @@ volumes:
 services:
 
   browser:
-    build: .
+    build: ./chromium
     privileged: true # required for UDEV to find plugged in peripherals such as a USB mouse
     network_mode: host
-    volumes:
-      - 'settings:/data' # Only required if using PERSISTENT flag (see below)
+    restart: always
+
+  notify:
+    restart: "on-failure"
+    privileged: true
+    build: ./notify

@@ -46,7 +46,7 @@ async function getUrlToDisplayAsync() {
 
       // Prepend http:// if the LAUNCH_URL doesn't have it.
       // This is needed for the --app flag to be used for kiosk mode
-      if (!HTTPS_REGEX.test(launchUrl)) {
+      if (!launchUrl.startsWith('file:///') && !HTTPS_REGEX.test(launchUrl)) {
         launchUrl = `http://${launchUrl}`;
       }
 
@@ -91,12 +91,12 @@ async function getUrlToDisplayAsync() {
     else
     {
       console.log("Displaying default HTML page");
-      returnURL = "file:///home/chromium/index.html";
+      returnURL = "file:///home/chromium/help/index.html";
     }
 
     return returnURL;
   }
-       
+
 // Launch the browser with the URL specified
 let launchChromium = async function(url) {
     await chromeLauncher.killAll();
@@ -159,8 +159,8 @@ let launchChromium = async function(url) {
       console.log("Disabling KIOSK mode");
     }
 
-    console.log(`Starting Chromium with flags: ${flags}`);
-    console.log(`Displaying URL: ${startingUrl}`);
+    console.log('Starting Chromium with flags: %j', flags);
+    console.log('Displaying URL: %s', startingUrl);
 
     const chrome = await chromeLauncher.launch({
       startingUrl: startingUrl,
@@ -169,9 +169,10 @@ let launchChromium = async function(url) {
       port: REMOTE_DEBUG_PORT,
       connectionPollInterval: 1000,
       maxConnectionRetries: 120,
+      logLevel: 'error',
       userDataDir: '1' === PERSISTENT_DATA ? '/data/chromium' : undefined
     });
-      
+
     console.log(`Chromium remote debugging tools running on port: ${chrome.port}`);
     currentUrl = url;
 }
@@ -193,7 +194,7 @@ async function setTimer(interval) {
     },
     interval
   )
-  
+
 }
 
 async function clearTimer(){
@@ -236,7 +237,7 @@ app.use(errorHandler);
 
 // ping endpoint
 app.get('/ping', (req, res) => {
-    
+
     return res.status(200).send('ok');
 });
 
@@ -267,13 +268,13 @@ app.post('/url', (req, res) => {
 
 // url get endpoint
 app.get('/url', (req, res) => {
-    
+
   return res.status(200).send(currentUrl);
 });
 
 // refresh endpoint
 app.post('/refresh', (req, res) => {
- 
+
   launchChromium(currentUrl);
   return res.status(200).send('ok');
 });
@@ -295,7 +296,7 @@ app.post('/gpu/:gpu', (req, res) => {
 });
 // gpu get endpoint
 app.get('/gpu', (req, res) => {
-    
+
   return res.status(200).send(enableGpu.toString());
 });
 
@@ -323,25 +324,25 @@ app.post('/autorefresh/:interval', async(req, res) => {
   {
     await setTimer((req.params.interval * 1000))
   }
-  
+
   return res.status(200).send('ok');
 });
 
 // flags endpoint
-app.get('/flags', (req, res) => { 
-    
+app.get('/flags', (req, res) => {
+
   return res.status(200).send(flags.toString());
 });
 
 // kiosk get endpoint
 app.get('/kiosk', (req, res) => {
-    
+
   return res.status(200).send(kioskMode.toString());
 });
 
 // version get endpoint
 app.get('/version', (req, res) => {
-  
+
   let version = process.env.VERSION || "Version not set";
   return res.status(200).send(version.toString());
 });
@@ -374,7 +375,7 @@ app.get('/screenshot', async(req, res) => {
 
 // scan endpoint - causes the device to rescan for local HTTP services
 app.post('/scan', (req, res) => {
- 
+
   main().catch(err => {
     console.log("Scan error: ", err);
     process.exit(1);
