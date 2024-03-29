@@ -1,16 +1,10 @@
-ARG NODEJS_VERSION="18.14.1"
-
-FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-node:${NODEJS_VERSION}-bookworm-run
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian:bookworm-run
 
 # Install the necessary packages
 COPY ./build /usr/src/build
 RUN /usr/src/build/install_chromium "%%BALENA_MACHINE_NAME%%"
 
 WORKDIR /usr/src/app
-
-# install node dependencies
-COPY ./package.json /usr/src/app/package.json
-RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force
 
 COPY ./src /usr/src/app/
 

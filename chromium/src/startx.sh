@@ -93,14 +93,34 @@ if [[ $REFRESH_TOKEN ]]; then
 fi
 
 export LAUNCH_URL="file:///home/chromium/index.html?url=${DISPLAY_URL}"
-# export LAUNCH_URL=$DISPLAY_URL
 
-node /usr/src/app/server.js
+/usr/bin/chromium-browser \
+  --disable-features=TranslateUI \
+  --disable-component-extensions-with-background-pages \
+  --disable-background-networking \
+  --disable-sync \
+  --metrics-recording-only \
+  --disable-default-apps \
+  --no-default-browser-check \
+  --no-first-run \
+  --disable-backgrounding-occluded-windows \
+  --disable-renderer-backgrounding \
+  --disable-background-timer-throttling \
+  --force-fieldtrials=*BackgroundTracing/default/ \
+  --window-size=3840,2160 \
+  --window-position=0,0 \
+  --autoplay-policy=no-user-gesture-required \
+  --noerrdialogs \
+  --disable-session-crashed-bubble \
+  --check-for-update-interval=31536000 \
+  --disable-dev-shm-usage \
+  --noerrdialogs \
+  --disable-session-crashed-bubble \
+  --high-dpi-support=0 \
+  --hide-scrollbars \
+  --enable-zero-copy \
+  --num-raster-threads=4 \
+  --ignore-gpu-blocklist \
+  --enable-gpu-rasterization \
+  --app="$LAUNCH_URL"
 
-#/usr/bin/chromium-browser \
-#  --window-size=1920,1080 \
-#  --autoplay-policy=no-user-gesture-required \
-#  --noerrdialogs \
-#  --disable-session-crashed-bubble \
-#  --check-for-update-interval=31536000 \
-#  --disable-dev-shm-usage
