@@ -36,6 +36,10 @@ else
   echo "Window size set by environment variable to $WINDOW_SIZE"
 fi
 
+if [[ -z "$WINDOW_POSITION" ]]; then
+  exoprt WINDOW_POSITION="0,0"
+fi
+
 # rotate screen if env variable is set [normal, inverted, left or right]
 if [[ ! -z "$ROTATE_DISPLAY" ]]; then
   sleep 3 && xrandr -o $ROTATE_DISPLAY
@@ -107,8 +111,8 @@ export LAUNCH_URL="file:///home/chromium/index.html?url=${DISPLAY_URL}"
   --disable-renderer-backgrounding \
   --disable-background-timer-throttling \
   --force-fieldtrials=*BackgroundTracing/default/ \
-  --window-size=3840,2160 \
-  --window-position=0,0 \
+  --window-size="$WINDOW_SIZE" \
+  --window-position="$WINDOW_POSITION" \
   --autoplay-policy=no-user-gesture-required \
   --noerrdialogs \
   --disable-session-crashed-bubble \
