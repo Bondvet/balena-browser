@@ -37,7 +37,7 @@ else
 fi
 
 if [[ -z "$WINDOW_POSITION" ]]; then
-  exoprt WINDOW_POSITION="0,0"
+  export WINDOW_POSITION="0,0"
 fi
 
 # rotate screen if env variable is set [normal, inverted, left or right]
